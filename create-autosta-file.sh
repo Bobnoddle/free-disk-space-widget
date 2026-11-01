@@ -1,12 +1,12 @@
 #!/bin/bash
 set -euo pipefail
 
-# Points launchd at the .app bundle binary (LSUIElement agent, no Dock icon).
-APP_BIN="$(cd "$(dirname "$0")" && pwd)/FreeDiskSpaceWidget.app/Contents/MacOS/free-disk-space-widget"
+# Points launchd at the installed .app bundle in /Applications.
+APP_BIN="/Applications/FreeDiskSpaceWidget.app/Contents/MacOS/free-disk-space-widget"
 PLIST="$HOME/Library/LaunchAgents/com.github.jayu.free-disk-space-widget.plist"
 
 if [[ ! -x "$APP_BIN" ]]; then
-  echo "Missing $APP_BIN — run ./build-app.sh first" >&2
+  echo "Missing $APP_BIN — install the app to /Applications first" >&2
   exit 1
 fi
 
