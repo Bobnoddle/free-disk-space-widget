@@ -159,7 +159,6 @@ var (
 	lastTitle   string
 	lastTip     string
 	volItems    map[string]*systray.MenuItem // path -> submenu item
-	volRadio    map[string]*systray.MenuItem // path -> radio menu item
 	primaryPath string
 	intervalCh  chan time.Duration
 	loginToggle *systray.MenuItem
@@ -240,13 +239,17 @@ func onReady() {
 
 	systray.SetTitle(diskEmoji + " Init")
 
-	// --- Volumes submenu ---
+	// Menu items in display order.
+	mRefresh := systray.AddMenuItem("Refresh now", "Update immediately")
+	mInterval := systray.AddMenuItem("Refresh interval", "")
 	mVolumes := systray.AddMenuItem("Volumes", "Mounted volumes")
+	loginToggle = systray.AddMenuItemCheckbox("Launch at login", "", isLoginItem())
+	mQuit := systray.AddMenuItem("Quit", "Quit the whole app")
+
+	// --- Volumes submenu ---
 	volItems = make(map[string]*systray.MenuItem)
-	volRadio = make(map[string]*systray.MenuItem)
 
 	// --- Refresh interval submenu ---
-	mInterval := systray.AddMenuItem("Refresh interval", "")
 	presets := []struct {
 		label string
 		sec   int
@@ -284,7 +287,6 @@ func onReady() {
 	}
 
 	// Refresh now.
-	mRefresh := systray.AddMenuItem("Refresh now", "Update immediately")
 	go func() {
 		for range mRefresh.ClickedCh {
 			updateVolumes()
@@ -292,14 +294,12 @@ func onReady() {
 	}()
 
 	// --- Launch at login toggle ---
-	loginToggle = systray.AddMenuItemCheckbox("Launch at login", "", isLoginItem())
 	go func() {
 		for range loginToggle.ClickedCh {
 			toggleLoginItem()
 		}
 	}()
 
-	mQuit := systray.AddMenuItem("Quit", "Quit the whole app")
 	go func() {
 		<-mQuit.ClickedCh
 		systray.Quit()
