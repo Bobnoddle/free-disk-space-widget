@@ -1,31 +1,32 @@
 # Free-disk-space-widget
 
-Simple MacOS app to show free disk space in menubar.
-
-
-
-<img src="demo.png" alt="Free disk space widget" width="400">
+Simple macOS menubar app showing free disk space on `/`.
 
 ## Build
 
 ```bash
-go build -ldflags="-s -w" .
+./build-app.sh
 ```
+
+Produces `FreeDiskSpaceWidget.app` (LSUIElement agent, no Dock icon, ~3.7MB).
 
 ## Run on login
 
 ```bash
 ./create-autosta-file.sh
 ```
-This creates a `free-disk-space-widget.autostart.plist` file in `~/Library/LaunchAgents/` directory.
 
-Then add the plist to launchctl:
+Installs and loads `~/Library/LaunchAgents/com.github.jayu.free-disk-space-widget.plist`.
+
+## Uninstall
 
 ```bash
-launchctl load ~/Library/LaunchAgents/free-disk-space-widget.autostart.plist
+./uninstall.sh
 ```
 
-To revert that, remove the plist from launchctl:
-```bash
-launchctl unload ~/Library/LaunchAgents/free-disk-space-widget.autostart.plist
-```
+## Notes
+
+- Polls every 30s via `syscall.Statfs("/")` (no `diskutil` fork).
+- Menubar shows `⛁ 11.19 GB`; tooltip shows used %.
+- Change-guard skips menubar IPC when nothing changed.
+- For permanent use, move `.app` to `/Applications` and update the plist path.
